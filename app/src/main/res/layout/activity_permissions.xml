@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/permission_explanation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This app needs the following permissions to work properly:"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/permission_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="• Read External Storage\n• Write External Storage"
+        android:textSize="16sp"
+        android:layout_below="@id/permission_explanation"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/request_permissions_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Request Permissions"
+        android:layout_below="@id/permission_list"
+        android:layout_centerHorizontal="true"
+        android:padding="12dp"
+        android:background="?attr/colorPrimary"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>

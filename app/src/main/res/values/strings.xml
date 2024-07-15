@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">DocuVault</string>
+
+    <!-- App Description -->
+    <string name="app_desc">DocuVault is your personal document management solution, allowing you to securely store, organize, and manage your important documents and vehicle paperwork in one convenient place.</string>
+
+        <!-- Other string resources -->
+        <string name="server_client_id">1006110768506-kv30sv7t51t8q4v6jpdga01n0ocio4aq.apps.googleusercontent.com</string>
+
+
+    <!-- Menu -->
+    <string name="action_settings">Settings</string>
+
+    <!-- Navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+
+    <!-- Login Form -->
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="google_sign_in">Sign in with Google</string>
+
+    <!-- Miscellaneous -->
+    <string name="welcome_message">Welcome to DocuVault!</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">Dont have an account?</string>
+    <string name="create_account">Create Account</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="try_again">Please try again.</string>
+    <string name="document_expiry_warning">Your document is about to expire. Please renew it soon.</string>
+    <string name="document_added_successfully">Document added successfully.</string>
+    <string name="document_deleted">Document deleted.</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="logout">Logout</string>
+    <string name="profile_updated">Profile updated successfully.</string>
+</resources>
