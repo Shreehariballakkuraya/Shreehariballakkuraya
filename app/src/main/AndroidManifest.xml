@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:hardwareAccelerated="false"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,9 +14,9 @@
         android:theme="@style/Theme.Docuvault"
         tools:targetApi="31">
 
-        <!-- Declare LoginActivity as the launcher activity -->
+        <!-- Declare com.hari.docuvault.LoginActivity as the launcher activity -->
         <activity
-            android:name="com.hari.docuvault.LoginActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Docuvault">
@@ -33,6 +34,9 @@
         <meta-data
             android:name="com.google.android.gms.client_id"
             android:value="@string/server_client_id" />
+
+
+
 
 
     </application>

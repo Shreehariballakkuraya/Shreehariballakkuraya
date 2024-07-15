@@ -2,11 +2,12 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
     namespace 'com.hari.docuvault'
-    compileSdk 35
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.hari.docuvault"
@@ -17,6 +18,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         packagingOptions {
+            exclude 'META-INF/INDEX.LIST'
             exclude 'META-INF/DEPENDENCIES'
             exclude 'META-INF/NOTICE'
             exclude 'META-INF/LICENSE'
@@ -24,6 +26,7 @@ android {
             exclude 'META-INF/ASL2.0'
         }
     }
+
 
     buildTypes {
         release {
@@ -57,6 +60,7 @@ dependencies {
     implementation 'com.google.api-client:google-api-client-android:2.6.0'
     implementation 'com.google.api-client:google-api-client:2.6.0'
     implementation 'com.google.api-client:google-api-client-gson:2.6.0'
+    implementation 'com.google.firebase:firebase-bom:33.1.2'
     implementation 'com.google.android.gms:play-services-base:18.5.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'

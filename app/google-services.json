@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "1006110768506",
+    "project_id": "docuvault-428814",
+    "storage_bucket": "docuvault-428814.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006110768506:android:c2c5cb8ddd438562f5aac3",
+        "android_client_info": {
+          "package_name": "com.hari.docuvault"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1006110768506-kv30sv7t51t8q4v6jpdga01n0ocio4aq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hari.docuvault",
+            "certificate_hash": "ab4d550c41d45e78469c4c74d4743d25991705ae"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_tJJje4uIrXTV16NCRVAjin77Yyh-UbY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

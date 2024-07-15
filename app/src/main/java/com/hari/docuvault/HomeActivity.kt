@@ -2,7 +2,7 @@ package com.hari.docuvault
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.docuvault.R
+
 
 class HomeActivity : AppCompatActivity() {
 
