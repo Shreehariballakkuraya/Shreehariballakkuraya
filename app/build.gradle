@@ -8,14 +8,17 @@ plugins {
 android {
     namespace 'com.hari.docuvault'
     compileSdk 34
-
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "com.hari.docuvault"
         minSdk 24
         targetSdk 35
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "String", "CUSTOM_URL", '"https://hari.com"'
+        buildConfigField "Boolean", "IS_DEBUG", "true"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         packagingOptions {
             exclude 'META-INF/INDEX.LIST'
@@ -64,5 +67,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-base:18.5.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
+    implementation 'com.google.api-client:google-api-client-android:1.32.2'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
+
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }

@@ -1,10 +1,18 @@
 package com.hari.docuvault
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -17,18 +25,20 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var signInButton: SignInButton
+    private lateinit var skipButton: Button
+
+    private val REQUEST_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.loginpage)
 
-        // Configure sign-in to request the user's ID, email address, and basic profile.
+        // Configure Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.server_client_id)) // Replace with your server client ID
+            .requestIdToken(getString(R.string.server_client_id))
             .requestEmail()
             .build()
 
-        // Build a GoogleSignInClient with the options specified.
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         // Initialize Google Sign-In button and set the click listener
@@ -36,55 +46,78 @@ class LoginActivity : AppCompatActivity() {
         signInButton.setOnClickListener {
             signIn()
         }
+
+        // Initialize Skip button and set the click listener
+        skipButton = findViewById(R.id.skip)
+        skipButton.setOnClickListener {
+            navigateToHomePage()
+        }
+
+        // Check and request permissions
+        if (!hasStoragePermissions()) {
+            requestStoragePermissions()
+        }
     }
 
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        resultLauncher.launch(signInIntent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult> { result ->
+        if (result.resultCode == RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                // Signed in successfully
+                val account = task.getResult(ApiException::class.java)
+                handleSignInSuccess(account)
+            } catch (e: ApiException) {
+                // Handle sign-in failure
+                Log.w("LoginActivity", "signInResult:failed code=" + e.statusCode)
+                handleSignInFailure(e)
+            }
         }
+    })
+
+    private fun handleSignInSuccess(account: GoogleSignInAccount?) {
+        // Handle the authenticated user
+        Log.d("LoginActivity", "Signed in successfully: ${account?.displayName}")
+        navigateToHomePage()
     }
 
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            // The Task returned from this call is always completed, so there is no need to check isSuccessful().
-            val account = completedTask.getResult(ApiException::class.java)
-            // Signed in successfully, show authenticated UI.
-            Log.d("com.hari.docuvault.LoginActivity", "Signed in as: ${account?.displayName}")
-            // TODO: Handle the authenticated user
-            // Example:
-            // - Update UI to show user's name
-            // - Save user's information in SharedPreferences or a database
-            // - Redirect to another activity or fragment in your app
-            navigateToMainActivity()
-
-        } catch (e: ApiException) {
-            Log.w("com.hari.docuvault.LoginActivity", "signInResult:failed code=" + e.statusCode)
-            // TODO: Handle sign-in failure
-            // Example:
-            // - Show a message to the user indicating that sign-in failed
-            // - Log the error or notify an analytics service
-            // - Optionally, allow the user to retry sign-in
-            Toast.makeText(this, "Sign-in failed. Please try again.", Toast.LENGTH_SHORT).show()
-        }
+    private fun handleSignInFailure(exception: ApiException) {
+        // Handle sign-in failure
+        Log.w("LoginActivity", "Sign-in failed: ${exception.localizedMessage}")
+        Toast.makeText(this, "Sign-in failed. Please try again.", Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateToMainActivity() {
-        // Example: Navigate to another activity
+    private fun navigateToHomePage() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()  // Close the login activity
     }
 
-    companion object {
-        private const val RC_SIGN_IN = 9001
+    private fun hasStoragePermissions(): Boolean {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestStoragePermissions() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            REQUEST_PERMISSIONS)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_PERMISSIONS) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show()
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

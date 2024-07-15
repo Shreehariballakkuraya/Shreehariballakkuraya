@@ -44,4 +44,7 @@
     <string name="update_profile">Update Profile</string>
     <string name="logout">Logout</string>
     <string name="profile_updated">Profile updated successfully.</string>
+
+    <string name="upload_button_text">UPLOAD</string>
+    <string name="view_button_text">VIEW</string>
 </resources>
