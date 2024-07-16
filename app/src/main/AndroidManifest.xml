@@ -25,6 +25,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
         <!-- Declare com.hari.docuvault.LoginActivity as the launcher activity -->
         <activity
             android:name=".LoginActivity"
@@ -40,9 +41,6 @@
         <activity android:name="com.hari.docuvault.PermissionsActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".ViewActivity" />
-
-
-
 
         <!-- Google Sign-In metadata -->
         <meta-data

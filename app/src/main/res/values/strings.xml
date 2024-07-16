@@ -47,4 +47,5 @@
 
     <string name="upload_button_text">UPLOAD</string>
     <string name="view_button_text">VIEW</string>
+    <string name="select_file_button_text">SELECT</string>
 </resources>

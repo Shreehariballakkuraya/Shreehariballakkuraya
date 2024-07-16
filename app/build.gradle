@@ -47,8 +47,10 @@ android {
         jvmTarget = '1.8'
     }
 
+
     buildFeatures {
-        viewBinding true
+        dataBinding true  // Enable data binding
+        viewBinding true  // Enable view binding
     }
 }
 
@@ -68,8 +70,13 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    implementation 'com.google.api-client:google-api-client-android:1.32.2'
+    implementation 'com.google.api-client:google-api-client-android:2.6.0'
     implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'com.google.firebase:firebase-auth-ktx:23.0.0'
+    implementation 'com.google.firebase:firebase-storage-ktx:21.0.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }

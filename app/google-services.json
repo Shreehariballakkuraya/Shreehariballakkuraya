@@ -20,6 +20,10 @@
             "package_name": "com.hari.docuvault",
             "certificate_hash": "ab4d550c41d45e78469c4c74d4743d25991705ae"
           }
+        },
+        {
+          "client_id": "1006110768506-fka0fimhlig7rnem7272c1nncf1bdea2.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -29,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1006110768506-fka0fimhlig7rnem7272c1nncf1bdea2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -6,35 +7,34 @@
     android:padding="16dp"
     tools:context=".LoginActivity">
 
-    <!-- App Logo at the top -->
 
-    <!-- Spacer -->
+    <!-- App Logo at the top -->
     <ImageView
         android:id="@+id/logo"
         android:layout_width="wrap_content"
-        android:layout_height="353dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="32dp"
         android:src="@drawable/logo" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="48dp" />
 
     <!-- Google Sign-In Button -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_sign_in_google"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <Button
-        android:id="@+id/skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="32dp" />
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="end|top"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:text="skip for now" />
-    <!-- Additional layout components (optional) -->
+        android:visibility="gone"
+        android:src="@drawable/ic_profile_placeholder" />
+
+
+
 
 </LinearLayout>

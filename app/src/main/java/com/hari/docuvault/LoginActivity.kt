@@ -1,18 +1,12 @@
 package com.hari.docuvault
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
-import android.widget.Button
+import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -20,104 +14,110 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.SignInButton
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.hari.docuvault.HomeActivity
+import com.hari.docuvault.R
+import com.squareup.picasso.Picasso
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var signInButton: SignInButton
-    private lateinit var skipButton: Button
+    private lateinit var profileImageView: ImageView
 
-    private val REQUEST_PERMISSIONS = 1
+    private val Req_Code: Int = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.loginpage)
 
+        FirebaseApp.initializeApp(this)
+
         // Configure Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.server_client_id))
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        firebaseAuth = FirebaseAuth.getInstance()
 
         // Initialize Google Sign-In button and set the click listener
         signInButton = findViewById(R.id.btn_sign_in_google)
         signInButton.setOnClickListener {
-            signIn()
+            Toast.makeText(this, "Logging In", Toast.LENGTH_SHORT).show()
+            signInGoogle()
         }
 
-        // Initialize Skip button and set the click listener
-        skipButton = findViewById(R.id.skip)
-        skipButton.setOnClickListener {
-            navigateToHomePage()
-        }
+        // Initialize Profile ImageView
+        profileImageView = findViewById(R.id.profileImageView)
 
-        // Check and request permissions
-        if (!hasStoragePermissions()) {
-            requestStoragePermissions()
+        // Check for existing sign-in
+        checkExistingSignIn()
+    }
+
+    private fun signInGoogle() {
+        val signInIntent: Intent = mGoogleSignInClient.signInIntent
+        startActivityForResult(signInIntent, Req_Code)
+    }
+
+    // Handle result from Google Sign-In
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Req_Code) {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
         }
     }
 
-    private fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        resultLauncher.launch(signInIntent)
-    }
-
-    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult> { result ->
-        if (result.resultCode == RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                // Signed in successfully
-                val account = task.getResult(ApiException::class.java)
-                handleSignInSuccess(account)
-            } catch (e: ApiException) {
-                // Handle sign-in failure
-                Log.w("LoginActivity", "signInResult:failed code=" + e.statusCode)
-                handleSignInFailure(e)
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
+            if (account != null) {
+                updateUI(account)
             }
+        } catch (e: ApiException) {
+            Log.w("LoginActivity", "signInResult:failed code=" + e.statusCode)
+            Toast.makeText(this, "Sign-in failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
         }
-    })
-
-    private fun handleSignInSuccess(account: GoogleSignInAccount?) {
-        // Handle the authenticated user
-        Log.d("LoginActivity", "Signed in successfully: ${account?.displayName}")
-        navigateToHomePage()
     }
 
-    private fun handleSignInFailure(exception: ApiException) {
-        // Handle sign-in failure
-        Log.w("LoginActivity", "Sign-in failed: ${exception.localizedMessage}")
-        Toast.makeText(this, "Sign-in failed. Please try again.", Toast.LENGTH_SHORT).show()
-    }
+    private fun updateUI(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Save user information
+                SavedPreference.setEmail(this, account.email.toString())
+                SavedPreference.setUsername(this, account.displayName.toString())
 
-    private fun navigateToHomePage() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish()  // Close the login activity
-    }
+                // Update profile picture
+                account.photoUrl?.let { photoUrl ->
+                    Picasso.get().load(photoUrl).into(profileImageView)
+                    profileImageView.visibility = ImageView.VISIBLE
+                } ?: run {
+                    profileImageView.visibility = ImageView.GONE
+                }
 
-    private fun hasStoragePermissions(): Boolean {
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestStoragePermissions() {
-        ActivityCompat.requestPermissions(this,
-            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            REQUEST_PERMISSIONS)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_PERMISSIONS) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show()
+                // Redirect to HomeActivity
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                finish()
             } else {
-                // Permission denied
-                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun checkExistingSignIn() {
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if (account != null) {
+            // User is already signed in
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }
