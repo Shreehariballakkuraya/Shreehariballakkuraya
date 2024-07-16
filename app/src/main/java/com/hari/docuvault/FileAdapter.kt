@@ -1,30 +1,31 @@
-// FileAdapter.kt
 package com.hari.docuvault
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.io.File
+import com.hari.docuvault.databinding.ItemFileBinding
 
-class FileAdapter(private val fileList: List<File>) : RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
+class FileAdapter(private val fileList: List<String>) : RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_file, parent, false)
-        return FileViewHolder(view)
+        val binding = ItemFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FileViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
-        val file = fileList[position]
-        holder.fileNameTextView.text = file.name
+        val fileName = fileList[position]
+        holder.bind(fileName)
     }
 
     override fun getItemCount(): Int {
         return fileList.size
     }
 
-    inner class FileViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val fileNameTextView: TextView = itemView.findViewById(R.id.fileNameTextView)
+    inner class FileViewHolder(private val binding: ItemFileBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(fileName: String) {
+            // Display file name or URL
+            binding.fileNameTextView.text = fileName // Format this if needed
+        }
     }
 }

@@ -41,6 +41,7 @@
         <activity android:name="com.hari.docuvault.PermissionsActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".ViewActivity" />
+        <activity android:name=".FolderViewActivity" />
 
         <!-- Google Sign-In metadata -->
         <meta-data

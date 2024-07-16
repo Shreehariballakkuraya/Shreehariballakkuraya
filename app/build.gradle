@@ -67,6 +67,7 @@ dependencies {
     implementation 'com.google.api-client:google-api-client-gson:2.6.0'
     implementation 'com.google.firebase:firebase-bom:33.1.2'
     implementation 'com.google.android.gms:play-services-base:18.5.0'
+    implementation libs.firebase.firestore.ktx
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     implementation 'com.google.android.gms:play-services-auth:19.2.0'

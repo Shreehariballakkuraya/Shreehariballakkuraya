@@ -17,8 +17,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.hari.docuvault.HomeActivity
-import com.hari.docuvault.R
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 
 class LoginActivity : AppCompatActivity() {
@@ -99,6 +98,27 @@ class LoginActivity : AppCompatActivity() {
                     profileImageView.visibility = ImageView.VISIBLE
                 } ?: run {
                     profileImageView.visibility = ImageView.GONE
+                }
+
+                // Create user ID in Firestore
+                val userId = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
+                val firestore = FirebaseFirestore.getInstance()
+                val userRef = firestore.collection("users").document(userId)
+
+                val userData = hashMapOf(
+                    "email" to account.email,
+                    "displayName" to account.displayName,
+                    "photoUrl" to account.photoUrl.toString()
+                )
+
+                userRef.set(userData).addOnCompleteListener { dbTask ->
+                    if (dbTask.isSuccessful) {
+                        // Data saved successfully
+                        Toast.makeText(this, "User data saved", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Handle failure
+                        Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 // Redirect to HomeActivity

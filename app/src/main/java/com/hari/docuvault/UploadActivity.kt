@@ -16,6 +16,7 @@ class UploadActivity : AppCompatActivity() {
 
     private var selectedFileUri: Uri? = null
     private lateinit var binding: ActivityUploadBinding
+    private var selectedFolder: String = "others"  // Default folder
 
     private val selectFileLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -50,16 +51,24 @@ class UploadActivity : AppCompatActivity() {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Folder selection logic
+        binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            selectedFolder = when (checkedId) {
+                R.id.radio_vehicle -> "vehicle"
+                R.id.radio_personal -> "personal"
+                R.id.radio_others -> "others"
+                else -> "others"
+            }
+        }
     }
 
     private fun authenticateUser() {
         FirebaseAuth.getInstance().signInAnonymously()
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Authentication successful
                     Toast.makeText(this, "Authentication successful", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Authentication failed
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -76,14 +85,14 @@ class UploadActivity : AppCompatActivity() {
         return fileName
     }
 
-    private fun uploadFile(uri: Uri) {
-        val storageRef = FirebaseStorage.getInstance().reference
-        val fileName = getFileName(uri) ?: "unknown"
-        val fileRef = storageRef.child("uploads/$fileName")
+    private fun uploadFile(fileUri: Uri) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val fileName = getFileName(fileUri) ?: "unknown_file"
+        val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/$selectedFolder/$fileName")
 
-        fileRef.putFile(uri)
+        storageRef.putFile(fileUri)
             .addOnSuccessListener {
-                Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "File uploaded successfully", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
