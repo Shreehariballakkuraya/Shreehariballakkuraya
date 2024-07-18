@@ -15,47 +15,47 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Docuvault"
-        tools:targetApi="31">
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
-        <!-- Declare com.hari.docuvault.LoginActivity as the launcher activity -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Docuvault">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name="com.hari.docuvault.HomeActivity" />
-        <activity android:name="com.hari.docuvault.PermissionsActivity" />
-        <activity android:name=".UploadActivity" />
-        <activity android:name=".ViewActivity" />
-        <activity android:name=".FolderViewActivity" />
-
-        <!-- Google Sign-In metadata -->
+        android:name=".MyApplication"
+    tools:targetApi="31">
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
         <meta-data
-            android:name="com.google.android.gms.client_id"
-            android:value="@string/server_client_id" />
-        <meta-data
-            android:name="com.google.android.gms.auth.api.signin.OAuthConsumerKey"
-            android:value="@string/server_client_id" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+    </provider>
 
+    <!-- Declare the activities -->
+    <activity
+        android:name=".LoginActivity"
+        android:exported="true"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Docuvault">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+    <activity android:name=".HomeActivity" />
+    <activity android:name=".UploadActivity" />
+    <activity android:name=".ViewActivity" />
+    <activity android:name=".FileViewActivity" />
+    <activity android:name=".VehicleMetadataActivity" />
+    <activity android:name=".PersonalMetadataActivity" />
+    <activity android:name=".OtherMetadataActivity" />
 
+    <!-- Google Sign-In metadata -->
+    <meta-data
+        android:name="com.google.android.gms.client_id"
+        android:value="@string/server_client_id" />
+    <meta-data
+        android:name="com.google.android.gms.auth.api.signin.OAuthConsumerKey"
+        android:value="@string/server_client_id" />
+    <meta-data
+        android:name="com.google.android.gms.version"
+        android:value="@integer/google_play_services_version" />
+</application>
 
-    </application>
-
-</manifest>
+    </manifest>

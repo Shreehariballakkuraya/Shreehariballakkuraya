@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/documentTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Document Title" />
+
+    <EditText
+        android:id="@+id/documentTypeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Document Type" />
+
+    <EditText
+        android:id="@+id/additionalInfoEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Additional Info (Optional)" />
+
+    <Button
+        android:id="@+id/selectFileButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select File" />
+
+    <ImageView
+        android:id="@+id/selectedFileImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/submitMetadataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit" />
+
+</LinearLayout>

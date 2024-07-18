@@ -3,7 +3,6 @@ package com.hari.docuvault
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +11,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.SignInButton
-import com.google.firebase.FirebaseApp
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,8 +30,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.loginpage)
-
-        FirebaseApp.initializeApp(this)
 
         // Configure Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -77,6 +73,9 @@ class LoginActivity : AppCompatActivity() {
             val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
             if (account != null) {
                 updateUI(account)
+            } else {
+                // Google Sign In failed, show toast
+                Toast.makeText(this, "Google Sign In failed", Toast.LENGTH_SHORT).show()
             }
         } catch (e: ApiException) {
             Log.w("LoginActivity", "signInResult:failed code=" + e.statusCode)
@@ -84,50 +83,58 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUI(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Save user information
-                SavedPreference.setEmail(this, account.email.toString())
-                SavedPreference.setUsername(this, account.displayName.toString())
+    private fun updateUI(account: GoogleSignInAccount?) {
+        if (account != null) {
+            // Login successful
+            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+            // Continue with your existing logic
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Save user information
+                    SavedPreference.setEmail(this, account.email.toString())
+                    SavedPreference.setUsername(this, account.displayName.toString())
 
-                // Update profile picture
-                account.photoUrl?.let { photoUrl ->
-                    Picasso.get().load(photoUrl).into(profileImageView)
-                    profileImageView.visibility = ImageView.VISIBLE
-                } ?: run {
-                    profileImageView.visibility = ImageView.GONE
-                }
-
-                // Create user ID in Firestore
-                val userId = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
-                val firestore = FirebaseFirestore.getInstance()
-                val userRef = firestore.collection("users").document(userId)
-
-                val userData = hashMapOf(
-                    "email" to account.email,
-                    "displayName" to account.displayName,
-                    "photoUrl" to account.photoUrl.toString()
-                )
-
-                userRef.set(userData).addOnCompleteListener { dbTask ->
-                    if (dbTask.isSuccessful) {
-                        // Data saved successfully
-                        Toast.makeText(this, "User data saved", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Handle failure
-                        Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                    // Update profile picture
+                    account.photoUrl?.let { photoUrl ->
+                        Picasso.get().load(photoUrl).into(profileImageView)
+                        profileImageView.visibility = ImageView.VISIBLE
+                    } ?: run {
+                        profileImageView.visibility = ImageView.GONE
                     }
-                }
 
-                // Redirect to HomeActivity
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
-                finish()
-            } else {
-                Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    // Create user ID in Firestore
+                    val userId = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
+                    val firestore = FirebaseFirestore.getInstance()
+                    val userRef = firestore.collection("users").document(userId)
+
+                    val userData = hashMapOf(
+                        "email" to account.email,
+                        "displayName" to account.displayName,
+                        "photoUrl" to account.photoUrl.toString()
+                    )
+
+                    userRef.set(userData).addOnCompleteListener { dbTask ->
+                        if (dbTask.isSuccessful) {
+                            // Data saved successfully
+                            Toast.makeText(this, "User data saved", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Handle failure
+                            Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    // Redirect to HomeActivity
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                }
             }
+        } else {
+            // Login unsuccessful
+            Toast.makeText(this, "Login unsuccessful", Toast.LENGTH_SHORT).show()
         }
     }
 

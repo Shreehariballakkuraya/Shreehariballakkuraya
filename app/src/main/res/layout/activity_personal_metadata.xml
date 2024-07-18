@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/documentTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Document Title"
+        android:inputType="text"/>
+
+    <Spinner
+        android:id="@+id/documentTypeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/documentTitleEditText"
+        android:prompt="@string/select_document_type"/>
+
+    <EditText
+        android:id="@+id/issueDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/documentTypeSpinner"
+        android:hint="Issue Date"
+        android:inputType="date"/>
+
+    <EditText
+        android:id="@+id/expiryDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/issueDateEditText"
+        android:hint="Expiry Date"
+        android:inputType="date"/>
+
+    <Button
+        android:id="@+id/selectFileButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/expiryDateEditText"
+        android:text="Select File"/>
+
+    <ImageView
+        android:id="@+id/selectedFileImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectFileButton"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/submitMetadataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectedFileImageView"
+        android:layout_marginTop="16dp"
+        android:text="Submit Metadata"/>
+
+</RelativeLayout>

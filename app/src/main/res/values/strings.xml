@@ -49,4 +49,5 @@
     <string name="view_button_text">VIEW</string>
     <string name="select_file_button_text">SELECT</string>
     <string name="default_web_client_id">1006110768506-fka0fimhlig7rnem7272c1nncf1bdea2.apps.googleusercontent.com</string>
+    <string name="select_document_type">Select\\\n</string>
 </resources>

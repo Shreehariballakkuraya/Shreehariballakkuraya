@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/vehicleNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Vehicle Name"/>
+
+    <EditText
+        android:id="@+id/documentTypeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Document Type"
+        android:layout_below="@id/vehicleNameEditText"/>
+
+    <EditText
+        android:id="@+id/expiryDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Expiry Date"
+        android:layout_below="@id/documentTypeEditText"/>
+
+    <EditText
+        android:id="@+id/vehicleNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Vehicle Number"
+        android:layout_below="@id/expiryDateEditText"/>
+
+    <Button
+        android:id="@+id/selectFileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select File"
+        android:layout_below="@id/vehicleNumberEditText"/>
+
+    <ImageView
+        android:id="@+id/selectedFileImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectFileButton"
+        android:contentDescription="Selected File"/>
+
+    <Button
+        android:id="@+id/uploadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload"
+        android:layout_below="@id/selectedFileImageView"/>
+</RelativeLayout>

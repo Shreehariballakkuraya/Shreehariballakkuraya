@@ -1,48 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/radio_vehicle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vehicle" />
-
-        <RadioButton
-            android:id="@+id/radio_personal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Personal" />
-
-        <RadioButton
-            android:id="@+id/radio_others"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Others" />
-    </RadioGroup>
-
+    <!-- Button to navigate to Vehicle Metadata Activity -->
     <Button
-        android:id="@+id/selectFileButton"
-        android:layout_width="wrap_content"
+        android:id="@+id/vehicleButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select File"
-        android:layout_below="@id/radioGroup"
-        android:layout_marginTop="16dp" />
+        android:text="Vehicle" />
 
+    <!-- Button to navigate to Personal Metadata Activity -->
     <Button
-        android:id="@+id/uploadButton"
-        android:layout_width="wrap_content"
+        android:id="@+id/personalButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Upload"
-        android:layout_below="@id/selectFileButton"
-        android:layout_marginTop="16dp" />
+        android:text="Personal" />
 
-</RelativeLayout>
+    <!-- Button to navigate to Other Metadata Activity -->
+    <Button
+        android:id="@+id/otherButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Other" />
+</LinearLayout>
