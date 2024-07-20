@@ -3,34 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp">
 
     <Button
         android:id="@+id/vehicleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:text="Vehicle" />
+        android:text="Vehicle Documents"
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/personalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:text="Personal" />
+        android:text="Personal Documents"
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/otherButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:text="Other" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fileRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:text="Other Documents" />
 </LinearLayout>
