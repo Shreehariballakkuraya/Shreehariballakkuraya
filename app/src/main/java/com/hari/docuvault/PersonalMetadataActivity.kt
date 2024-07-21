@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,6 +34,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
                 selectedFileUri = result.data?.data
                 selectedFileUri?.let { uri ->
                     val fileName = getFileName(uri)
+                    Log.d("PersonalMetadata", "Selected file: $fileName")
                     selectedFileImageView.setImageURI(uri)
                     Toast.makeText(this, "Selected file: $fileName", Toast.LENGTH_SHORT).show()
                 }
@@ -107,11 +109,14 @@ class PersonalMetadataActivity : AppCompatActivity() {
 
     private fun uploadFile(fileUri: Uri, documentTitle: String, documentType: String, issueDate: String, expiryDate: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val fileName = getFileName(fileUri) ?: "unknown_file"
+        val rawFileName = getFileName(fileUri) ?: "unknown_file"
+        val fileName = sanitizeFileName(rawFileName)
+        Log.d("PersonalMetadata", "Sanitized file name: $fileName")
         val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/personal/$fileName")
 
         storageRef.putFile(fileUri)
             .addOnSuccessListener {
+                Log.d("PersonalMetadata", "File uploaded successfully: $fileName")
                 saveMetadata(documentTitle, documentType, issueDate, expiryDate, fileName)
             }
             .addOnFailureListener { exception ->
@@ -126,11 +131,14 @@ class PersonalMetadataActivity : AppCompatActivity() {
             "documentTitle" to documentTitle,
             "documentType" to documentType,
             "issueDate" to issueDate,
-            "expiryDate" to expiryDate
+            "expiryDate" to expiryDate,
+            "fileName" to sanitizeFileName(fileName)
         )
 
-        // Use Firebase Realtime Database to store metadata
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal_metadata").child(sanitizeFileName(fileName))
+        val sanitizedFileName = sanitizeFileName(fileName)
+        Log.d("PersonalMetadata", "Saving metadata for file: $sanitizedFileName")
+
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal_metadata").child(sanitizedFileName)
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
@@ -145,8 +153,9 @@ class PersonalMetadataActivity : AppCompatActivity() {
     }
 
     private fun sanitizeFileName(fileName: String): String {
-        // Replace invalid characters in Firebase Realtime Database key
-        return fileName.replace(".", "_").replace("#", "_").replace("$", "_").replace("[", "_").replace("]", "_")
+        val sanitizedFileName = fileName.replace(Regex("[.#$\\[\\]]"), "_")
+        Log.d("PersonalMetadata", "Sanitized file name inside method: $sanitizedFileName")
+        return sanitizedFileName
     }
 
     private fun showDatePickerDialog(editText: EditText) {

@@ -45,8 +45,9 @@
     <activity android:name=".VehicleMetadataActivity" />
     <activity android:name=".PersonalMetadataActivity" />
     <activity android:name=".OtherMetadataActivity" />
-
-    <!-- Google Sign-In metadata -->
+        <activity android:name=".VehicleViewActivity" />
+        <activity android:name=".PersonalViewActivity" />
+        <activity android:name=".OtherViewActivity"/>
     <meta-data
         android:name="com.google.android.gms.client_id"
         android:value="@string/server_client_id" />

@@ -92,13 +92,14 @@ class VehicleMetadataActivity : AppCompatActivity() {
     private fun uploadFile(fileUri: Uri, vehicleName: String, documentType: String, expiryDate: String, vehicleNumber: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val fileName = getFileName(fileUri) ?: "unknown_file"
+        val sanitizedFileName = sanitizeFileName(fileName)
         val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/vehicle/$fileName")
 
         storageRef.putFile(fileUri)
             .addOnSuccessListener { uploadTask ->
                 storageRef.downloadUrl
                     .addOnSuccessListener { uri ->
-                        saveMetadata(vehicleName, documentType, expiryDate, vehicleNumber, fileName, uri.toString())
+                        saveMetadata(vehicleName, documentType, expiryDate, vehicleNumber, sanitizedFileName, uri.toString())
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(this, "Failed to get download URL: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -133,5 +134,14 @@ class VehicleMetadataActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to save metadata: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun sanitizeFileName(fileName: String): String {
+        // Replace invalid characters in Firebase Realtime Database key
+        return fileName.replace(".", "_")
+            .replace("#", "_")
+            .replace("$", "_")
+            .replace("[", "_")
+            .replace("]", "_")
     }
 }

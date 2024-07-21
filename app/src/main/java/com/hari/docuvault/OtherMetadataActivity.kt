@@ -88,7 +88,8 @@ class OtherMetadataActivity : AppCompatActivity() {
 
     private fun uploadFile(fileUri: Uri, documentTitle: String, documentType: String, additionalInfo: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val fileName = getFileName(fileUri) ?: "unknown_file"
+        val rawFileName = getFileName(fileUri) ?: "unknown_file"
+        val fileName = sanitizeFileName(rawFileName)
         val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/others/$fileName")
 
         storageRef.putFile(fileUri)
@@ -109,7 +110,8 @@ class OtherMetadataActivity : AppCompatActivity() {
             "additionalInfo" to additionalInfo
         )
 
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("other_metadata").child(fileName)
+        val sanitizedFileName = sanitizeFileName(fileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("other_metadata").child(sanitizedFileName)
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
@@ -121,5 +123,9 @@ class OtherMetadataActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to save metadata: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun sanitizeFileName(fileName: String): String {
+        return fileName.replace(Regex("[.#$\\[\\]]"), "_")
     }
 }

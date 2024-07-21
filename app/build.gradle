@@ -87,7 +87,7 @@ dependencies {
     implementation 'io.grpc:grpc-okhttp:1.65.1'
     implementation 'io.grpc:grpc-protobuf-lite:1.65.1'
     implementation 'com.google.firebase:firebase-database:20.0.5'
-
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
 
 
 
