@@ -54,8 +54,19 @@ class PersonalMetadataActivity : AppCompatActivity() {
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
 
         // Populate document types spinner
-        val documentTypes = arrayOf("Passport", "Driver's License", "Insurance Card", "Other")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, documentTypes)
+        val personalDocumentTypes = arrayOf(
+            "Aadhaar Card",
+            "PAN Card",
+            "Passport",
+            "Driver's License",
+            "Voter ID Card",
+            "Bank Statement",
+            "Health Insurance Card",
+            "Tax Return (ITR)",
+            "Birth Certificate",
+            "Marriage Certificate"
+        )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, personalDocumentTypes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         documentTypeSpinner.adapter = adapter
 
@@ -79,7 +90,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
 
         submitMetadataButton.setOnClickListener {
             val documentTitle = documentTitleEditText.text.toString().trim()
-            val documentType = documentTypes[documentTypeSpinner.selectedItemPosition]
+            val documentType = personalDocumentTypes[documentTypeSpinner.selectedItemPosition]
             val issueDate = issueDateEditText.text.toString().trim()
             val expiryDate = expiryDateEditText.text.toString().trim()
 

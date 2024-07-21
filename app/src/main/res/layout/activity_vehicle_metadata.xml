@@ -9,19 +9,20 @@
         android:layout_height="wrap_content"
         android:hint="Vehicle Name"/>
 
-    <EditText
-        android:id="@+id/documentTypeEditText"
+    <Spinner
+        android:id="@+id/documentTypeSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Document Type"
-        android:layout_below="@id/vehicleNameEditText"/>
+        android:layout_below="@id/vehicleNameEditText"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/expiryDateEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Expiry Date"
-        android:layout_below="@id/documentTypeEditText"/>
+        android:layout_below="@id/documentTypeSpinner"/>
 
     <EditText
         android:id="@+id/vehicleNumberEditText"

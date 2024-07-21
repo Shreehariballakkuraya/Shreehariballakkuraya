@@ -15,12 +15,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import java.util.regex.Pattern
 
 class OtherMetadataActivity : AppCompatActivity() {
 
     private lateinit var documentTitleEditText: EditText
     private lateinit var documentTypeEditText: EditText
     private lateinit var additionalInfoEditText: EditText
+    private lateinit var categoryEditText: EditText
+    private lateinit var tagsEditText: EditText
+    private lateinit var dateAddedEditText: EditText
     private lateinit var submitMetadataButton: Button
     private lateinit var selectFileButton: Button
     private lateinit var selectedFileImageView: ImageView
@@ -45,6 +49,9 @@ class OtherMetadataActivity : AppCompatActivity() {
         documentTitleEditText = findViewById(R.id.documentTitleEditText)
         documentTypeEditText = findViewById(R.id.documentTypeEditText)
         additionalInfoEditText = findViewById(R.id.additionalInfoEditText)
+        categoryEditText = findViewById(R.id.categoryEditText)
+        tagsEditText = findViewById(R.id.tagsEditText)
+        dateAddedEditText = findViewById(R.id.dateAddedEditText)
         submitMetadataButton = findViewById(R.id.submitMetadataButton)
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
@@ -61,6 +68,9 @@ class OtherMetadataActivity : AppCompatActivity() {
             val documentTitle = documentTitleEditText.text.toString().trim()
             val documentType = documentTypeEditText.text.toString().trim()
             val additionalInfo = additionalInfoEditText.text.toString().trim()
+            val category = categoryEditText.text.toString().trim()
+            val tags = tagsEditText.text.toString().trim()
+            val dateAdded = dateAddedEditText.text.toString().trim()
 
             if (documentTitle.isEmpty() || documentType.isEmpty()) {
                 Toast.makeText(this, "Document title and document type are required", Toast.LENGTH_SHORT).show()
@@ -68,7 +78,7 @@ class OtherMetadataActivity : AppCompatActivity() {
             }
 
             selectedFileUri?.let { uri ->
-                uploadFile(uri, documentTitle, documentType, additionalInfo)
+                uploadFile(uri, documentTitle, documentType, additionalInfo, category, tags, dateAdded)
             } ?: run {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
             }
@@ -86,7 +96,7 @@ class OtherMetadataActivity : AppCompatActivity() {
         return fileName
     }
 
-    private fun uploadFile(fileUri: Uri, documentTitle: String, documentType: String, additionalInfo: String) {
+    private fun uploadFile(fileUri: Uri, documentTitle: String, documentType: String, additionalInfo: String, category: String, tags: String, dateAdded: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val rawFileName = getFileName(fileUri) ?: "unknown_file"
         val fileName = sanitizeFileName(rawFileName)
@@ -94,20 +104,27 @@ class OtherMetadataActivity : AppCompatActivity() {
 
         storageRef.putFile(fileUri)
             .addOnSuccessListener {
-                saveMetadata(documentTitle, documentType, additionalInfo, fileName)
+                // Get the download URL
+                storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                    saveMetadata(documentTitle, documentType, additionalInfo, category, tags, dateAdded, fileName, downloadUrl.toString())
+                }
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun saveMetadata(documentTitle: String, documentType: String, additionalInfo: String, fileName: String) {
+    private fun saveMetadata(documentTitle: String, documentType: String, additionalInfo: String, category: String, tags: String, dateAdded: String, fileName: String, fileUrl: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         val metadata = hashMapOf(
             "documentTitle" to documentTitle,
             "documentType" to documentType,
-            "additionalInfo" to additionalInfo
+            "additionalInfo" to additionalInfo,
+            "category" to category,
+            "tags" to tags,
+            "dateAdded" to dateAdded,
+            "fileUrl" to fileUrl
         )
 
         val sanitizedFileName = sanitizeFileName(fileName)

@@ -19,7 +19,7 @@ class HomeActivity : AppCompatActivity() {
 
         uploadButton.setOnClickListener {
             // Navigate to UploadActivity
-            val intent = Intent(this, UploadActivity::class.java)
+            val intent = Intent(this, UploadMenuActivity::class.java)
             startActivity(intent)
         }
 

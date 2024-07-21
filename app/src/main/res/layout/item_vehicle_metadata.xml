@@ -1,38 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/vehicleNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vehicle Name" />
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/downloadButton"/>
 
     <TextView
         android:id="@+id/documentTypeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Document Type" />
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/vehicleNameTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/downloadButton"/>
 
     <TextView
         android:id="@+id/expiryDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Expiry Date" />
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/documentTypeTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/downloadButton"/>
 
     <TextView
         android:id="@+id/vehicleNumberTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Vehicle Number" />
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/expiryDateTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/downloadButton"/>
 
-    <ImageView
-        android:id="@+id/fileImageView"
+    <Button
+        android:id="@+id/downloadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_file" />
+        android:text="Download"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

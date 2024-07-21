@@ -1,13 +1,11 @@
 package com.hari.docuvault
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -15,11 +13,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.*
 
 class VehicleMetadataActivity : AppCompatActivity() {
 
     private lateinit var vehicleNameEditText: EditText
-    private lateinit var documentTypeEditText: EditText
+    private lateinit var documentTypeSpinner: Spinner
     private lateinit var expiryDateEditText: EditText
     private lateinit var vehicleNumberEditText: EditText
     private lateinit var uploadButton: Button
@@ -39,29 +39,57 @@ class VehicleMetadataActivity : AppCompatActivity() {
             }
         }
 
+    private lateinit var datePickerDialog: DatePickerDialog
+    private val calendar: Calendar = Calendar.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vehicle_metadata)
 
+        // Initialize views
         vehicleNameEditText = findViewById(R.id.vehicleNameEditText)
-        documentTypeEditText = findViewById(R.id.documentTypeEditText)
+        documentTypeSpinner = findViewById(R.id.documentTypeSpinner)
         expiryDateEditText = findViewById(R.id.expiryDateEditText)
         vehicleNumberEditText = findViewById(R.id.vehicleNumberEditText)
         uploadButton = findViewById(R.id.uploadButton)
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
 
+        // Populate document types spinner
+        val vehicleDocumentTypes = arrayOf(
+            "Vehicle Registration (RC)",
+            "Driver's License",
+            "Insurance Paper",
+            "Pollution Under Control (PUC) Certificate",
+            "Vehicle Fitness Certificate",
+            "Service Record",
+            "Challan/Fine",
+            "Loan Document",
+            "Lease Agreement",
+            "Warranty Document"
+        )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, vehicleDocumentTypes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        documentTypeSpinner.adapter = adapter
+
+        // Set up date picker for expiry date
+        expiryDateEditText.setOnClickListener {
+            showDatePickerDialog()
+        }
+
+        // Set up file selection
         selectFileButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "*/*"
+                type = "*/*" // Select any file type
             }
             selectFileLauncher.launch(intent)
         }
 
+        // Set up file upload
         uploadButton.setOnClickListener {
             val vehicleName = vehicleNameEditText.text.toString().trim()
-            val documentType = documentTypeEditText.text.toString().trim()
+            val documentType = vehicleDocumentTypes[documentTypeSpinner.selectedItemPosition]
             val expiryDate = expiryDateEditText.text.toString().trim()
             val vehicleNumber = vehicleNumberEditText.text.toString().trim()
 
@@ -78,6 +106,25 @@ class VehicleMetadataActivity : AppCompatActivity() {
         }
     }
 
+    // Show date picker dialog
+    private fun showDatePickerDialog() {
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        datePickerDialog = DatePickerDialog(
+            this,
+            { _, selectedYear, selectedMonth, selectedDay ->
+                calendar.set(selectedYear, selectedMonth, selectedDay)
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                expiryDateEditText.setText(dateFormat.format(calendar.time))
+            },
+            year, month, day
+        )
+        datePickerDialog.show()
+    }
+
+    // Get file name from URI
     private fun getFileName(uri: Uri): String? {
         var fileName: String? = null
         contentResolver.query(uri, null, null, null, null)?.use { cursor ->
@@ -89,14 +136,16 @@ class VehicleMetadataActivity : AppCompatActivity() {
         return fileName
     }
 
+    // Upload file to Firebase Storage
     private fun uploadFile(fileUri: Uri, vehicleName: String, documentType: String, expiryDate: String, vehicleNumber: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val fileName = getFileName(fileUri) ?: "unknown_file"
         val sanitizedFileName = sanitizeFileName(fileName)
-        val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/vehicle/$fileName")
+        val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/vehicle/$sanitizedFileName")
 
         storageRef.putFile(fileUri)
-            .addOnSuccessListener { uploadTask ->
+            .addOnSuccessListener {
+                // Get the download URL after successful upload
                 storageRef.downloadUrl
                     .addOnSuccessListener { uri ->
                         saveMetadata(vehicleName, documentType, expiryDate, vehicleNumber, sanitizedFileName, uri.toString())
@@ -110,6 +159,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
             }
     }
 
+    // Save metadata to Firebase Realtime Database
     private fun saveMetadata(vehicleName: String, documentType: String, expiryDate: String, vehicleNumber: String, fileName: String, fileUrl: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
@@ -136,6 +186,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
             }
     }
 
+    // Sanitize file name to be used as a key in Firebase
     private fun sanitizeFileName(fileName: String): String {
         // Replace invalid characters in Firebase Realtime Database key
         return fileName.replace(".", "_")
