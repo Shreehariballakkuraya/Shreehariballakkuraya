@@ -3,9 +3,13 @@ package com.hari.docuvault
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var signInButton: SignInButton
     private lateinit var profileImageView: ImageView
+    private lateinit var progressBar: ProgressBar
 
     private val Req_Code: Int = 123
 
@@ -47,8 +52,9 @@ class LoginActivity : AppCompatActivity() {
             signInGoogle()
         }
 
-        // Initialize Profile ImageView
+        // Initialize Profile ImageView and ProgressBar
         profileImageView = findViewById(R.id.profileImageView)
+        progressBar = findViewById(R.id.progressBar)
 
         // Check for existing sign-in
         checkExistingSignIn()
@@ -85,9 +91,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateUI(account: GoogleSignInAccount?) {
         if (account != null) {
-            // Login successful
+            showProgressBar()
             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-            // Continue with your existing logic
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
             firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -97,7 +102,10 @@ class LoginActivity : AppCompatActivity() {
 
                     // Update profile picture
                     account.photoUrl?.let { photoUrl ->
-                        Picasso.get().load(photoUrl).into(profileImageView)
+                        Glide.with(this)
+                            .load(photoUrl)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(profileImageView)
                         profileImageView.visibility = ImageView.VISIBLE
                     } ?: run {
                         profileImageView.visibility = ImageView.GONE
@@ -115,6 +123,7 @@ class LoginActivity : AppCompatActivity() {
                     )
 
                     userRef.set(userData).addOnCompleteListener { dbTask ->
+                        hideProgressBar() // Hide progress bar after saving data
                         if (dbTask.isSuccessful) {
                             // Data saved successfully
                             Toast.makeText(this, "User data saved", Toast.LENGTH_SHORT).show()
@@ -130,11 +139,13 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 } else {
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    hideProgressBar() // Hide progress bar if authentication fails
                 }
             }
         } else {
             // Login unsuccessful
             Toast.makeText(this, "Login unsuccessful", Toast.LENGTH_SHORT).show()
+            hideProgressBar() // Hide progress bar if login fails
         }
     }
 
@@ -147,4 +158,13 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
 }
+

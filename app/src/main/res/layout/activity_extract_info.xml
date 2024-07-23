@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name of the person/vehicle/other"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/type_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Document Type"
+        android:layout_below="@id/name_edit_text"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/additional_info_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Additional Information"
+        android:layout_below="@id/type_edit_text"
+        android:layout_marginBottom="16dp"
+        android:lines="5"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/extract_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Extract Info"
+        android:layout_below="@id/additional_info_edit_text" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+</RelativeLayout>

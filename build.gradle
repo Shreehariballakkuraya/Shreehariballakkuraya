@@ -1,7 +1,7 @@
 buildscript {
     // Other configurations
     dependencies {
-        classpath 'com.google.gms:google-services:4.4.2' // Ensure this is the latest version
+        classpath libs.google.services
     }
 }
 plugins {

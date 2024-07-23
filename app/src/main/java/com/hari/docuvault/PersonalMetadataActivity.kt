@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
     private lateinit var submitMetadataButton: Button
     private lateinit var selectFileButton: Button
     private lateinit var selectedFileImageView: ImageView
+    private lateinit var progressBar: ProgressBar
 
     private var selectedFileUri: Uri? = null
     private val selectFileLauncher: ActivityResultLauncher<Intent> =
@@ -52,6 +54,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
         submitMetadataButton = findViewById(R.id.submitMetadataButton)
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
+        progressBar = findViewById(R.id.progressBar) // Initialize ProgressBar
 
         // Populate document types spinner
         val personalDocumentTypes = arrayOf(
@@ -100,6 +103,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
             }
 
             selectedFileUri?.let { uri ->
+                showProgressBar()
                 uploadFile(uri, documentTitle, documentType, issueDate, expiryDate)
             } ?: run {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
@@ -132,6 +136,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
     }
 
@@ -149,17 +154,19 @@ class PersonalMetadataActivity : AppCompatActivity() {
         val sanitizedFileName = sanitizeFileName(fileName)
         Log.d("PersonalMetadata", "Saving metadata for file: $sanitizedFileName")
 
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal_metadata").child(sanitizedFileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal").child(sanitizedFileName)
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
                 Toast.makeText(this, "Metadata saved successfully", Toast.LENGTH_SHORT).show()
                 selectedFileImageView.setImageURI(null)
                 selectedFileUri = null
+                hideProgressBar()
                 finish()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to save metadata: ${e.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
     }
 
@@ -173,10 +180,18 @@ class PersonalMetadataActivity : AppCompatActivity() {
         val datePicker = DatePickerFragment { day, month, year ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, day)
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val sdf = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
             val formattedDate = sdf.format(calendar.time)
             editText.setText(formattedDate)
         }
         datePicker.show(supportFragmentManager, "datePicker")
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }

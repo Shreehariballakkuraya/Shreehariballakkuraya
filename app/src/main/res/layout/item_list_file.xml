@@ -2,21 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:layout_margin="8dp"
+    android:orientation="vertical"
+    android:background="@drawable/card_background"
+    android:padding="16dp">
 
+    <!-- Metadata TextView -->
     <TextView
         android:id="@+id/metadataTextView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Metadata"
-        android:textSize="16sp" />
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Metadata"/>
 
+    <!-- Document Type TextView -->
+    <TextView
+        android:id="@+id/documentTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Expiry Date TextView -->
+    <TextView
+        android:id="@+id/expiryDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Download Button -->
     <Button
         android:id="@+id/downloadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Download" />
+        android:text="Download"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>

@@ -24,6 +24,7 @@ import java.io.File
 class VehicleViewActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
+    private lateinit var progressBar: ProgressBar
     private lateinit var storageRef: StorageReference
     private lateinit var databaseRef: DatabaseReference
 
@@ -45,11 +46,12 @@ class VehicleViewActivity : AppCompatActivity() {
 
         // Initialize views
         listView = findViewById(R.id.listView)
+        progressBar = findViewById(R.id.progressBar)  // Initialize ProgressBar
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             storageRef = FirebaseStorage.getInstance().reference.child("user_files").child(userId).child("vehicle")
-            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle_metadata")
+            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle")
             listFiles()
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
@@ -57,6 +59,7 @@ class VehicleViewActivity : AppCompatActivity() {
     }
 
     private fun listFiles() {
+        showProgressBar()
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val items = mutableListOf<Pair<String, StorageReference>>()
@@ -92,28 +95,34 @@ class VehicleViewActivity : AppCompatActivity() {
                     }
                 }
                 listView.adapter = adapter
+                hideProgressBar()  // Hide ProgressBar when files are listed
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@VehicleViewActivity, "Failed to load data: ${error.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()  // Hide ProgressBar on failure
             }
         })
     }
 
     private fun downloadFile(fileRef: StorageReference) {
+        showProgressBar()  // Show ProgressBar while downloading
+
         val localFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileRef.name)
 
         fileRef.getFile(localFile)
             .addOnSuccessListener {
                 // File downloaded successfully
-                Log.d("ListFilesActivity", "File downloaded to ${localFile.absolutePath}")
+                Log.d("VehicleViewActivity", "File downloaded to ${localFile.absolutePath}")
                 Toast.makeText(this, "File downloaded to ${localFile.absolutePath}", Toast.LENGTH_LONG).show()
                 openFile(localFile)
+                hideProgressBar()  // Hide ProgressBar after successful download
             }
             .addOnFailureListener { exception ->
                 // Handle any errors
                 Toast.makeText(this, "Download failed: ${exception.message}", Toast.LENGTH_SHORT).show()
-                Log.e("ListFilesActivity", "Download failed", exception)
+                Log.e("VehicleViewActivity", "Download failed", exception)
+                hideProgressBar()  // Hide ProgressBar on failure
             }
     }
 
@@ -135,10 +144,18 @@ class VehicleViewActivity : AppCompatActivity() {
                 startActivity(intent)
             } catch (e: Exception) {
                 Toast.makeText(this, "No application to open this file.", Toast.LENGTH_SHORT).show()
-                Log.e("ListFilesActivity", "Error opening file", e)
+                Log.e("VehicleViewActivity", "Error opening file", e)
             }
         } else {
             Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }

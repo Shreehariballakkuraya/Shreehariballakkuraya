@@ -27,6 +27,7 @@ class OtherViewActivity : AppCompatActivity() {
     private lateinit var listView: ListView
     private lateinit var storageRef: StorageReference
     private lateinit var databaseRef: DatabaseReference
+    private lateinit var progressBar: ProgressBar
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
@@ -46,11 +47,12 @@ class OtherViewActivity : AppCompatActivity() {
 
         // Initialize views
         listView = findViewById(R.id.listView)
+        progressBar = findViewById(R.id.progressBar)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            storageRef = FirebaseStorage.getInstance().reference.child("user_files").child(userId).child("other")
-            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("other_metadata")
+            storageRef = FirebaseStorage.getInstance().reference.child("user_files").child(userId).child("others")
+            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("others")
             listFiles()
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
@@ -58,6 +60,7 @@ class OtherViewActivity : AppCompatActivity() {
     }
 
     private fun listFiles() {
+        showProgressBar()
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val items = mutableListOf<Pair<String, StorageReference>>()
@@ -65,8 +68,7 @@ class OtherViewActivity : AppCompatActivity() {
                     val metadata = data.getValue(OtherMetadata::class.java)
                     val fileName = metadata?.fileName ?: "Unknown"
                     val fileRef = storageRef.child(fileName)
-                    val metadataText = "Name: ${metadata?.fileName ?: "N/A"}, Type: ${metadata?.documentType ?: "N/A"}, Expiry: ${metadata?.
-                    expiryDate ?: "N/A"}"
+                    val metadataText = "Name: ${metadata?.fileName ?: "N/A"}, Type: ${metadata?.documentType ?: "N/A"}, Expiry: ${metadata?.expiryDate ?: "N/A"}"
                     items.add(Pair(metadataText, fileRef))
                 }
 
@@ -93,15 +95,18 @@ class OtherViewActivity : AppCompatActivity() {
                     }
                 }
                 listView.adapter = adapter
+                hideProgressBar()
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@OtherViewActivity, "Failed to load data: ${error.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
         })
     }
 
     private fun downloadFile(fileRef: StorageReference) {
+        showProgressBar()
         val localFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileRef.name)
 
         fileRef.getFile(localFile)
@@ -110,11 +115,13 @@ class OtherViewActivity : AppCompatActivity() {
                 Log.d("OtherViewActivity", "File downloaded to ${localFile.absolutePath}")
                 Toast.makeText(this, "File downloaded to ${localFile.absolutePath}", Toast.LENGTH_LONG).show()
                 openFile(localFile)
+                hideProgressBar()
             }
             .addOnFailureListener { exception ->
                 // Handle any errors
                 Toast.makeText(this, "Download failed: ${exception.message}", Toast.LENGTH_SHORT).show()
                 Log.e("OtherViewActivity", "Download failed", exception)
+                hideProgressBar()
             }
     }
 
@@ -141,5 +148,13 @@ class OtherViewActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }

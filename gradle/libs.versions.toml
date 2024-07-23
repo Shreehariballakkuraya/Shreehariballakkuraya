@@ -7,6 +7,7 @@ credentials = "<latest version>"
 credentialsPlayServicesAuth = "<latest version"
 googleApiClientAndroid = "1.33.0"
 googleApiServicesDrive = "v3-rev136-1.25.0"
+googleServices = "4.4.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -34,6 +35,7 @@ androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx",
 gms-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 google-api-client-android = { module = "com.google.api-client:google-api-client-android", version = "2.6.0" }
 google-api-services-drive = { module = "com.google.apis:google-api-services-drive", version.ref = "googleApiServicesDrive" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version = "1.1.1" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

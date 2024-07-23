@@ -7,6 +7,7 @@ import android.provider.OpenableColumns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,7 +16,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import java.util.regex.Pattern
 
 class OtherMetadataActivity : AppCompatActivity() {
 
@@ -28,6 +28,7 @@ class OtherMetadataActivity : AppCompatActivity() {
     private lateinit var submitMetadataButton: Button
     private lateinit var selectFileButton: Button
     private lateinit var selectedFileImageView: ImageView
+    private lateinit var progressBar: ProgressBar
 
     private var selectedFileUri: Uri? = null
     private val selectFileLauncher: ActivityResultLauncher<Intent> =
@@ -55,6 +56,7 @@ class OtherMetadataActivity : AppCompatActivity() {
         submitMetadataButton = findViewById(R.id.submitMetadataButton)
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
+        progressBar = findViewById(R.id.progressBar)
 
         selectFileButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -78,6 +80,7 @@ class OtherMetadataActivity : AppCompatActivity() {
             }
 
             selectedFileUri?.let { uri ->
+                showProgressBar()
                 uploadFile(uri, documentTitle, documentType, additionalInfo, category, tags, dateAdded)
             } ?: run {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
@@ -110,6 +113,7 @@ class OtherMetadataActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { exception ->
+                hideProgressBar()
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
@@ -128,21 +132,31 @@ class OtherMetadataActivity : AppCompatActivity() {
         )
 
         val sanitizedFileName = sanitizeFileName(fileName)
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("other_metadata").child(sanitizedFileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("others").child(sanitizedFileName)
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
+                hideProgressBar()
                 Toast.makeText(this, "Metadata saved successfully", Toast.LENGTH_SHORT).show()
                 selectedFileImageView.setImageURI(null)
                 selectedFileUri = null
                 finish()
             }
             .addOnFailureListener { e ->
+                hideProgressBar()
                 Toast.makeText(this, "Failed to save metadata: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun sanitizeFileName(fileName: String): String {
         return fileName.replace(Regex("[.#$\\[\\]]"), "_")
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = android.view.View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = android.view.View.GONE
     }
 }

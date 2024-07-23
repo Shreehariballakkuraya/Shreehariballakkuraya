@@ -26,6 +26,7 @@ class PersonalViewActivity : AppCompatActivity() {
     private lateinit var listView: ListView
     private lateinit var storageRef: StorageReference
     private lateinit var databaseRef: DatabaseReference
+    private lateinit var progressBar: ProgressBar
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
@@ -45,11 +46,12 @@ class PersonalViewActivity : AppCompatActivity() {
 
         // Initialize views
         listView = findViewById(R.id.listView)
+        progressBar = findViewById(R.id.progressBar)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             storageRef = FirebaseStorage.getInstance().reference.child("user_files").child(userId).child("personal")
-            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal_metadata")
+            databaseRef = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal")
             listFiles()
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
@@ -57,15 +59,15 @@ class PersonalViewActivity : AppCompatActivity() {
     }
 
     private fun listFiles() {
+        showProgressBar()
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val items = mutableListOf<Pair<String, StorageReference>>()
                 for (data in snapshot.children) {
                     val metadata = data.getValue(PersonalMetadata::class.java)
                     val fileName = metadata?.fileName ?: "Unknown"
-                    val fileUrl = metadata?.fileUrl ?: ""
                     val fileRef = storageRef.child(fileName)
-                    val metadataText = "Name: ${metadata?.fileName ?: "N/A"}, Type: ${metadata?.documentType ?: "N/A"}, Expiry: ${metadata?.expiryDate ?: "N/A"}"
+                    val metadataText = "Name: $fileName, Type: ${metadata?.documentType ?: "N/A"}, Expiry: ${metadata?.expiryDate ?: "N/A"}"
                     items.add(Pair(metadataText, fileRef))
                 }
 
@@ -92,15 +94,18 @@ class PersonalViewActivity : AppCompatActivity() {
                     }
                 }
                 listView.adapter = adapter
+                hideProgressBar()
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@PersonalViewActivity, "Failed to load data: ${error.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
         })
     }
 
     private fun downloadFile(fileRef: StorageReference) {
+        showProgressBar()
         val localFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileRef.name)
 
         fileRef.getFile(localFile)
@@ -109,11 +114,13 @@ class PersonalViewActivity : AppCompatActivity() {
                 Log.d("PersonalViewActivity", "File downloaded to ${localFile.absolutePath}")
                 Toast.makeText(this, "File downloaded to ${localFile.absolutePath}", Toast.LENGTH_LONG).show()
                 openFile(localFile)
+                hideProgressBar()
             }
             .addOnFailureListener { exception ->
                 // Handle any errors
                 Toast.makeText(this, "Download failed: ${exception.message}", Toast.LENGTH_SHORT).show()
                 Log.e("PersonalViewActivity", "Download failed", exception)
+                hideProgressBar()
             }
     }
 
@@ -121,11 +128,9 @@ class PersonalViewActivity : AppCompatActivity() {
         if (file.exists()) {
             val fileUri = FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", file)
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, when {
-                    file.extension.equals("pdf", ignoreCase = true) -> "application/pdf"
-                    file.extension.equals("jpg", ignoreCase = true) ||
-                            file.extension.equals("jpeg", ignoreCase = true) ||
-                            file.extension.equals("png", ignoreCase = true) -> "image/*"
+                setDataAndType(fileUri, when (file.extension.lowercase()) {
+                    "pdf" -> "application/pdf"
+                    "jpg", "jpeg", "png" -> "image/*"
                     else -> "*/*" // For other file types
                 })
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -140,5 +145,13 @@ class PersonalViewActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }

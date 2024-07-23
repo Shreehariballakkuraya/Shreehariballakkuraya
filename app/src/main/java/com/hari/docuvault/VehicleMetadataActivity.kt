@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
     private lateinit var uploadButton: Button
     private lateinit var selectFileButton: Button
     private lateinit var selectedFileImageView: ImageView
+    private lateinit var progressBar: ProgressBar
 
     private var selectedFileUri: Uri? = null
     private val selectFileLauncher: ActivityResultLauncher<Intent> =
@@ -54,6 +56,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
         uploadButton = findViewById(R.id.uploadButton)
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileImageView = findViewById(R.id.selectedFileImageView)
+        progressBar = findViewById(R.id.progressBar) // Initialize the ProgressBar
 
         // Populate document types spinner
         val vehicleDocumentTypes = arrayOf(
@@ -99,6 +102,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
             }
 
             selectedFileUri?.let { uri ->
+                showProgressBar()
                 uploadFile(uri, vehicleName, documentType, expiryDate, vehicleNumber)
             } ?: run {
                 Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
@@ -106,7 +110,6 @@ class VehicleMetadataActivity : AppCompatActivity() {
         }
     }
 
-    // Show date picker dialog
     private fun showDatePickerDialog() {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -136,7 +139,6 @@ class VehicleMetadataActivity : AppCompatActivity() {
         return fileName
     }
 
-    // Upload file to Firebase Storage
     private fun uploadFile(fileUri: Uri, vehicleName: String, documentType: String, expiryDate: String, vehicleNumber: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val fileName = getFileName(fileUri) ?: "unknown_file"
@@ -152,10 +154,12 @@ class VehicleMetadataActivity : AppCompatActivity() {
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(this, "Failed to get download URL: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        hideProgressBar()
                     }
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
     }
 
@@ -172,27 +176,31 @@ class VehicleMetadataActivity : AppCompatActivity() {
             "fileUrl" to fileUrl
         )
 
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle_metadata").child(fileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle").child(fileName)
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
-                Toast.makeText(this, "Metadata saved successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "FILE UPLOADED SUCCESSFUL", Toast.LENGTH_SHORT).show()
                 selectedFileImageView.setImageURI(null)
                 selectedFileUri = null
+                hideProgressBar()
                 finish()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to save metadata: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "FAILED TO UPLOAD FILE: ${e.message}", Toast.LENGTH_SHORT).show()
+                hideProgressBar()
             }
     }
 
-    // Sanitize file name to be used as a key in Firebase
     private fun sanitizeFileName(fileName: String): String {
-        // Replace invalid characters in Firebase Realtime Database key
-        return fileName.replace(".", "_")
-            .replace("#", "_")
-            .replace("$", "_")
-            .replace("[", "_")
-            .replace("]", "_")
+        return fileName.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
     }
 }
