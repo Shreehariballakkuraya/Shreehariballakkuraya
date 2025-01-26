@@ -16,6 +16,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 
 class OtherMetadataActivity : AppCompatActivity() {
 
@@ -37,7 +40,11 @@ class OtherMetadataActivity : AppCompatActivity() {
                 selectedFileUri = result.data?.data
                 selectedFileUri?.let { uri ->
                     val fileName = getFileName(uri)
-                    selectedFileImageView.setImageURI(uri)
+                    try {
+                        selectedFileImageView.setImageURI(uri)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Error loading image: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                     Toast.makeText(this, "Selected file: $fileName", Toast.LENGTH_SHORT).show()
                 }
             }

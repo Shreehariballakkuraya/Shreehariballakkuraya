@@ -1,6 +1,7 @@
 package com.hari.docuvault
 
 import DatePickerFragment
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -37,11 +38,18 @@ class PersonalMetadataActivity : AppCompatActivity() {
                 selectedFileUri?.let { uri ->
                     val fileName = getFileName(uri)
                     Log.d("PersonalMetadata", "Selected file: $fileName")
-                    selectedFileImageView.setImageURI(uri)
+                    try {
+                        selectedFileImageView.setImageURI(uri)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Error loading image: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                     Toast.makeText(this, "Selected file: $fileName", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+
+    private lateinit var datePickerDialog: DatePickerDialog
+    private val calendar: Calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +140,15 @@ class PersonalMetadataActivity : AppCompatActivity() {
         storageRef.putFile(fileUri)
             .addOnSuccessListener {
                 Log.d("PersonalMetadata", "File uploaded successfully: $fileName")
-                saveMetadata(documentTitle, documentType, issueDate, expiryDate, fileName)
+                storageRef.downloadUrl
+                    .addOnSuccessListener { uri ->
+                        Log.d("PersonalMetadata", "Download URL: $uri")
+                        saveMetadata(documentTitle, documentType, issueDate, expiryDate, fileName, uri.toString())
+                    }
+                    .addOnFailureListener { exception ->
+                        Toast.makeText(this, "Failed to get download URL: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        hideProgressBar()
+                    }
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -140,7 +156,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
             }
     }
 
-    private fun saveMetadata(documentTitle: String, documentType: String, issueDate: String, expiryDate: String, fileName: String) {
+    private fun saveMetadata(documentTitle: String, documentType: String, issueDate: String, expiryDate: String, fileName: String, fileUrl: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         val metadata = hashMapOf(
@@ -148,13 +164,12 @@ class PersonalMetadataActivity : AppCompatActivity() {
             "documentType" to documentType,
             "issueDate" to issueDate,
             "expiryDate" to expiryDate,
-            "fileName" to sanitizeFileName(fileName)
+            "fileName" to fileName,
+            "fileUrl" to fileUrl
         )
 
-        val sanitizedFileName = sanitizeFileName(fileName)
-        Log.d("PersonalMetadata", "Saving metadata for file: $sanitizedFileName")
-
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal").child(sanitizedFileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("personal").push()
+        Log.d("PersonalMetadata", "Saving metadata with key: ${databaseRef.key}")
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
@@ -180,7 +195,7 @@ class PersonalMetadataActivity : AppCompatActivity() {
         val datePicker = DatePickerFragment { day, month, year ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, day)
-            val sdf = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val formattedDate = sdf.format(calendar.time)
             editText.setText(formattedDate)
         }

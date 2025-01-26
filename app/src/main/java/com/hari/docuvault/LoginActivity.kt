@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.hari.docuvault
 
 import android.content.Intent

@@ -4,20 +4,60 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <!-- Title Text -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Menu"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:fontFamily="sans-serif-condensed"/>
+
+    <!-- Auto Button -->
     <Button
         android:id="@+id/autoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Auto"
+        android:text="Auto Mode"
+        android:background="@drawable/button_background"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:elevation="8dp"
+        android:layout_below="@id/titleText"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="32dp" />
 
+    <!-- Manual Button -->
     <Button
         android:id="@+id/manualButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Manual"
+        android:text="Manual Mode"
+        android:background="@drawable/button_background"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:elevation="8dp"
         android:layout_below="@id/autoButton"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp" />
+
+    <!-- Icon -->
+    <ImageView
+        android:id="@+id/modeIcon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_mode_selection"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/autoButton"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Mode Selection Icon"
+        android:elevation="4dp" />
+
 </RelativeLayout>

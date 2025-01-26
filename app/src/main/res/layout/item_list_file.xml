@@ -3,37 +3,64 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@drawable/card_background"
     android:padding="16dp">
 
-    <!-- Metadata TextView -->
-    <TextView
-        android:id="@+id/metadataTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="Metadata"/>
+    <!-- Icon ImageView -->
+    <ImageView
+        android:id="@+id/fileIconImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="File Icon"
+        android:src="@drawable/ic_file" /> <!-- Default icon -->
 
-    <!-- Document Type TextView -->
-    <TextView
-        android:id="@+id/documentTypeTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp"/>
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <!-- Expiry Date TextView -->
-    <TextView
-        android:id="@+id/expiryDateTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp"/>
+        <!-- Metadata TextView -->
+        <TextView
+            android:id="@+id/metadataTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Metadata"/>
+
+        <!-- Document Type TextView -->
+        <TextView
+            android:id="@+id/documentTypeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Expiry Date TextView -->
+        <TextView
+            android:id="@+id/expiryDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Date Added TextView -->
+        <TextView
+            android:id="@+id/dateAddedTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:text="Date Added"/>
+
+    </LinearLayout>
 
     <!-- Download Button -->
     <Button
@@ -41,6 +68,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Download"
-        android:layout_marginTop="8dp"/>
+        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>

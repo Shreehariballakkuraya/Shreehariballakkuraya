@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="background_color">#121212</color>
+    <color name="button_color">#6200EE</color>
+    <color name="colorPrimary">#2ecc71</color>
+    <color name="colorPrimaryVariant">#27ae60</color>
+    <color name="colorSecondary">#3498db</color>
+    <color name="colorSecondaryVariant">#2980b9</color>
+    <color name="ripple_color">#3700B3</color> <!-- Ripple effect color (darker shade of button) -->
+    <color name="app_white">#FFFFFFFF</color>
+    <color name="app_purple">#9C27B0</color>
+    <color name="app_orange">#FF9800</color>
 </resources>

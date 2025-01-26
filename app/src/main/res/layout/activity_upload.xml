@@ -3,26 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@color/app_white">
 
-    <!-- Button to navigate to Vehicle Metadata Activity -->
+    <!-- Vehicle Button -->
     <Button
         android:id="@+id/vehicleButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Vehicle" />
+        android:text="Vehicle"
+        style="@style/CategoryButtonStyle"/>
 
-    <!-- Button to navigate to Personal Metadata Activity -->
+    <!-- Personal Button -->
     <Button
         android:id="@+id/personalButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Personal" />
+        android:text="Personal"
+        style="@style/CategoryButtonStyle"/>
 
-    <!-- Button to navigate to Other Metadata Activity -->
+    <!-- Other Button -->
     <Button
         android:id="@+id/otherButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Other" />
+        android:text="Other"
+        style="@style/CategoryButtonStyle"/>
+
 </LinearLayout>

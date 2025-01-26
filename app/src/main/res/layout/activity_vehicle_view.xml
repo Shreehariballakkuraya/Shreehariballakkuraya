@@ -4,6 +4,17 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <!-- Title Text -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vehicle Files"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed"/>
+
     <!-- ProgressBar -->
     <ProgressBar
         android:id="@+id/progressBar"
@@ -18,8 +29,8 @@
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/progressBar"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="16dp"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
         android:paddingBottom="16dp"/>

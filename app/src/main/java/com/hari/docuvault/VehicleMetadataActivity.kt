@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,7 +37,11 @@ class VehicleMetadataActivity : AppCompatActivity() {
                 selectedFileUri = result.data?.data
                 selectedFileUri?.let { uri ->
                     val fileName = getFileName(uri)
-                    selectedFileImageView.setImageURI(uri)
+                    try {
+                        selectedFileImageView.setImageURI(uri)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Error loading image: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                     Toast.makeText(this, "Selected file: $fileName", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -144,20 +150,24 @@ class VehicleMetadataActivity : AppCompatActivity() {
         val fileName = getFileName(fileUri) ?: "unknown_file"
         val sanitizedFileName = sanitizeFileName(fileName)
         val storageRef = FirebaseStorage.getInstance().reference.child("user_files/$userId/vehicle/$sanitizedFileName")
+        Log.d("VehicleMetadata", "Uploading file: $sanitizedFileName")
 
         storageRef.putFile(fileUri)
             .addOnSuccessListener {
                 // Get the download URL after successful upload
                 storageRef.downloadUrl
                     .addOnSuccessListener { uri ->
+                        Log.d("VehicleMetadata", "Download URL: $uri")
                         saveMetadata(vehicleName, documentType, expiryDate, vehicleNumber, sanitizedFileName, uri.toString())
                     }
                     .addOnFailureListener { exception ->
+                        Log.e("VehicleMetadata", "Failed to get download URL", exception)
                         Toast.makeText(this, "Failed to get download URL: ${exception.message}", Toast.LENGTH_SHORT).show()
                         hideProgressBar()
                     }
             }
             .addOnFailureListener { exception ->
+                Log.e("VehicleMetadata", "Upload failed", exception)
                 Toast.makeText(this, "Upload failed: ${exception.message}", Toast.LENGTH_SHORT).show()
                 hideProgressBar()
             }
@@ -166,6 +176,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
     // Save metadata to Firebase Realtime Database
     private fun saveMetadata(vehicleName: String, documentType: String, expiryDate: String, vehicleNumber: String, fileName: String, fileUrl: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        Log.d("VehicleMetadata", "Saving metadata: vehicleName=$vehicleName, documentType=$documentType, expiryDate=$expiryDate, vehicleNumber=$vehicleNumber, fileName=$fileName, fileUrl=$fileUrl")
 
         val metadata = hashMapOf(
             "vehicleName" to vehicleName,
@@ -176,10 +187,11 @@ class VehicleMetadataActivity : AppCompatActivity() {
             "fileUrl" to fileUrl
         )
 
-        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle").child(fileName)
+        val databaseRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("user_files").child(userId).child("vehicle").push()
 
         databaseRef.setValue(metadata)
             .addOnSuccessListener {
+                Log.d("VehicleMetadata", "Metadata saved successfully")
                 Toast.makeText(this, "FILE UPLOADED SUCCESSFUL", Toast.LENGTH_SHORT).show()
                 selectedFileImageView.setImageURI(null)
                 selectedFileUri = null
@@ -187,6 +199,7 @@ class VehicleMetadataActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener { e ->
+                Log.e("VehicleMetadata", "Failed to save metadata", e)
                 Toast.makeText(this, "FAILED TO UPLOAD FILE: ${e.message}", Toast.LENGTH_SHORT).show()
                 hideProgressBar()
             }

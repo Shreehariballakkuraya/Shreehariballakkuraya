@@ -4,11 +4,23 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Metadata"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed"/>
+
     <EditText
         android:id="@+id/documentTitleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Document Title"/>
+        android:hint="Document Title"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="16dp"/>
 
     <EditText
         android:id="@+id/documentTypeEditText"
@@ -46,7 +58,7 @@
         android:id="@+id/dateAddedEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date Added"
+        android:hint="Date Added (YYYY-MM-DD)"
         android:layout_below="@id/tagsEditText"
         android:layout_marginTop="8dp"/>
 
@@ -60,11 +72,13 @@
 
     <ImageView
         android:id="@+id/selectedFileImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:maxWidth="200dp"
+        android:maxHeight="200dp"
         android:layout_below="@id/selectFileButton"
         android:layout_marginTop="16dp"
-        android:contentDescription="Selected File"/>
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/submitMetadataButton"
@@ -72,12 +86,15 @@
         android:layout_height="wrap_content"
         android:text="Submit"
         android:layout_below="@id/selectedFileImageView"
-        android:layout_marginTop="16dp"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        style="@style/ButtonStyle"/>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
 </RelativeLayout>

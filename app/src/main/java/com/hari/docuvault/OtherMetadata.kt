@@ -1,7 +1,13 @@
+package com.hari.docuvault
+
 data class OtherMetadata(
-    val fileName: String? = null,
-    val fileUrl: String? = null,
+    val documentTitle: String? = null,
     val documentType: String? = null,
-    val expiryDate: String? = null, // This field should be here
-    val additionalInfo: String? = null
-)
+    val additionalInfo: String? = null,
+    val category: String? = null,
+    val tags: String? = null,
+    val dateAdded: String? = null,
+    val fileUrl: String? = null
+) {
+    var fileName: String? = null
+}

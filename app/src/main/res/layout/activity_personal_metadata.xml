@@ -4,64 +4,84 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Personal Metadata"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed"/>
+
     <EditText
         android:id="@+id/documentTitleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Document Title"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:layout_below="@id/titleText"
+        android:layout_marginTop="16dp"/>
 
     <Spinner
         android:id="@+id/documentTypeSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/documentTitleEditText"
+        android:layout_marginTop="8dp"
         android:prompt="@string/select_document_type"/>
 
     <EditText
         android:id="@+id/issueDateEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Issue Date (YYYY-MM-DD)"
         android:layout_below="@id/documentTypeSpinner"
-        android:hint="Issue Date"
+        android:layout_marginTop="8dp"
         android:inputType="date"/>
 
     <EditText
         android:id="@+id/expiryDateEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Expiry Date (YYYY-MM-DD)"
         android:layout_below="@id/issueDateEditText"
-        android:hint="Expiry Date"
+        android:layout_marginTop="8dp"
         android:inputType="date"/>
 
     <Button
         android:id="@+id/selectFileButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Select File"
         android:layout_below="@id/expiryDateEditText"
-        android:text="Select File"/>
+        android:layout_marginTop="16dp"/>
 
     <ImageView
         android:id="@+id/selectedFileImageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:maxWidth="200dp"
+        android:maxHeight="200dp"
         android:layout_below="@id/selectFileButton"
         android:layout_marginTop="16dp"
-        android:visibility="gone"/>
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/submitMetadataButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Submit"
         android:layout_below="@id/selectedFileImageView"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Submit Metadata"/>
+        style="@style/ButtonStyle"/>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone" />
-
+        android:visibility="gone"/>
 
 </RelativeLayout>

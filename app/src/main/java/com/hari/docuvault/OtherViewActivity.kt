@@ -1,45 +1,21 @@
 package com.hari.docuvault
 
-import OtherMetadata
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import java.io.File
 
-class OtherViewActivity : AppCompatActivity() {
+class OtherViewActivity : BaseFileViewActivity() {
 
     private lateinit var listView: ListView
     private lateinit var storageRef: StorageReference
     private lateinit var databaseRef: DatabaseReference
-    private lateinit var progressBar: ProgressBar
-
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) {
-            // Permission granted, proceed with the download
-            fileToDownload?.let { downloadFile(it) }
-        } else {
-            // Permission denied, show a message
-            Toast.makeText(this, "Storage permission is required to download files", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private var fileToDownload: StorageReference? = null
+    private var valueEventListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,14 +37,14 @@ class OtherViewActivity : AppCompatActivity() {
 
     private fun listFiles() {
         showProgressBar()
-        databaseRef.addValueEventListener(object : ValueEventListener {
+        valueEventListener = databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val items = mutableListOf<Pair<String, StorageReference>>()
                 for (data in snapshot.children) {
                     val metadata = data.getValue(OtherMetadata::class.java)
                     val fileName = metadata?.fileName ?: "Unknown"
                     val fileRef = storageRef.child(fileName)
-                    val metadataText = "Name: ${metadata?.fileName ?: "N/A"}, Type: ${metadata?.documentType ?: "N/A"}, Expiry: ${metadata?.expiryDate ?: "N/A"}"
+                    val metadataText = "Name: ${metadata?.documentTitle ?: "N/A"}, Type: ${metadata?.documentType ?: "N/A"}, Added: ${metadata?.dateAdded ?: "N/A"}"
                     items.add(Pair(metadataText, fileRef))
                 }
 
@@ -76,20 +52,29 @@ class OtherViewActivity : AppCompatActivity() {
                     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_list_file, parent, false)
                         val metadataTextView: TextView = view.findViewById(R.id.metadataTextView)
+                        val documentTypeTextView: TextView = view.findViewById(R.id.documentTypeTextView)
+                        val dateAddedTextView: TextView = view.findViewById(R.id.dateAddedTextView)
                         val downloadButton: Button = view.findViewById(R.id.downloadButton)
+                        val fileIconImageView: ImageView = view.findViewById(R.id.fileIconImageView)
 
                         val (metadata, fileRef) = getItem(position) ?: return view
+                        val metadataObj = snapshot.children.elementAt(position).getValue(OtherMetadata::class.java)
                         metadataTextView.text = metadata
+                        documentTypeTextView.text = "Type: ${metadataObj?.documentType ?: "N/A"}"
+                        dateAddedTextView.text = "Added: ${metadataObj?.dateAdded ?: "N/A"}"
+
+                        val fileExtension = fileRef.name.substringAfterLast('.', "")
+                        val iconResId = when (fileExtension.lowercase()) {
+                            "pdf" -> R.drawable.ic_pdf
+                            "jpg", "jpeg", "png" -> R.drawable.ic_image
+                            "doc", "docx" -> R.drawable.ic_doc
+                            "xls", "xlsx" -> R.drawable.ic_xls
+                            else -> R.drawable.ic_file
+                        }
+                        fileIconImageView.setImageResource(iconResId)
 
                         downloadButton.setOnClickListener {
-                            fileToDownload = fileRef
-                            if (ContextCompat.checkSelfPermission(this@OtherViewActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                                // Permission already granted
-                                fileToDownload?.let { downloadFile(it) }
-                            } else {
-                                // Request permission
-                                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            }
+                            checkStoragePermissionAndDownload(fileRef)
                         }
                         return view
                     }
@@ -105,56 +90,8 @@ class OtherViewActivity : AppCompatActivity() {
         })
     }
 
-    private fun downloadFile(fileRef: StorageReference) {
-        showProgressBar()
-        val localFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileRef.name)
-
-        fileRef.getFile(localFile)
-            .addOnSuccessListener {
-                // File downloaded successfully
-                Log.d("OtherViewActivity", "File downloaded to ${localFile.absolutePath}")
-                Toast.makeText(this, "File downloaded to ${localFile.absolutePath}", Toast.LENGTH_LONG).show()
-                openFile(localFile)
-                hideProgressBar()
-            }
-            .addOnFailureListener { exception ->
-                // Handle any errors
-                Toast.makeText(this, "Download failed: ${exception.message}", Toast.LENGTH_SHORT).show()
-                Log.e("OtherViewActivity", "Download failed", exception)
-                hideProgressBar()
-            }
-    }
-
-    private fun openFile(file: File) {
-        if (file.exists()) {
-            val fileUri = FileProvider.getUriForFile(this, "${applicationContext.packageName}.fileprovider", file)
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, when {
-                    file.extension.equals("pdf", ignoreCase = true) -> "application/pdf"
-                    file.extension.equals("jpg", ignoreCase = true) ||
-                            file.extension.equals("jpeg", ignoreCase = true) ||
-                            file.extension.equals("png", ignoreCase = true) -> "image/*"
-                    else -> "*/*" // For other file types
-                })
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-
-            try {
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "No application to open this file.", Toast.LENGTH_SHORT).show()
-                Log.e("OtherViewActivity", "Error opening file", e)
-            }
-        } else {
-            Toast.makeText(this, "File does not exist.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
-    }
-
-    private fun hideProgressBar() {
-        progressBar.visibility = View.GONE
+    override fun onDestroy() {
+        super.onDestroy()
+        valueEventListener?.let { databaseRef.removeEventListener(it) }
     }
 }
